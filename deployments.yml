@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  labels:
+    app: nginx-svc
+spec:
+  ports:
+  - name: web
+    port: 80
+  selector:
+    app: nginx-pod
+---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: nginx-svc-node
+#  labels:
+#    app: nginx-svc-node
+#spec:
+#  type: NodePort
+#  ports:
+#  - name: web
+#    port: 80
+#    targetPort: 80
+#    nodePort: 30000
+#  selector:
+#    app: nginx-pod
+#---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rs
+  labels:
+    app: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-pod
+  template:
+    metadata:
+      labels:
+        app: nginx-pod
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
