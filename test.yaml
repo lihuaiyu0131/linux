@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    app: nginx
+
+spec:
+  volumes:
+    - name: my-vol
+      hostPath: 
+        path: /data/nginx
+  containers:
+    - name: myapp
+      image: nginx
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        tcpSocket:
+          port: 80
+        initialDelaySeconds: 1
+        periodSeconds: 3
+        timeoutSeconds: 1
+      volumeMounts: 
+        - name: my-vol
+          mountPath: /var/log/nginx
+
+    - name: cat-log
+      image: busybox
+      imagePullPolicy: IfNotPresent
+      command: ['sh','-c','tail -f /var/log/nginx/access.log']
+      volumeMounts:
+        - name: my-vol
+          mountPath: /var/log/nginx
+
+  hostNetwork: true
+
